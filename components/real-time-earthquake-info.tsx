@@ -85,7 +85,6 @@ export function RealTimeEarthquakeInfo() {
             <div>
               <h1 className="text-2xl font-bold">{magnitude} Magnitude Earthquake</h1>
               <p className="text-lg text-muted-foreground">{location}</p>
-              <p className="text-sm text-muted-foreground">Data from USGS Earthquake API</p>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
