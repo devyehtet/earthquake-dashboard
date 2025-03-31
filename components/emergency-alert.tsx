@@ -1,10 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import Link from "next/link"
 import { AlertCircle, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
 import { getEarthquakes, formatEarthquakeTime, getEarthquakeSeverity } from "@/lib/earthquake-service"
 
 export function EmergencyAlert() {
@@ -42,56 +40,53 @@ export function EmergencyAlert() {
   const location = latestEarthquake.properties.place
   const time = formatEarthquakeTime(latestEarthquake.properties.time)
   const severity = getEarthquakeSeverity(magnitude)
+  const usgsUrl = latestEarthquake.properties.url
+
+  const onClose = () => {
+    setIsVisible(false)
+  }
+
+  const onEmergencyContactsClick = () => {
+    window.location.href = "/resources#emergency-contacts"
+  }
 
   return (
     <div className="mb-6 animate-fade-in">
-      <div
-        className={cn(
-          "relative rounded-lg border-2 border-red-500 bg-red-50 p-4",
-          "dark:border-red-500 dark:bg-red-900/30",
-        )}
-      >
+      <div className="w-full rounded-lg bg-red-600 p-4 text-white shadow-md">
         <div className="flex flex-col sm:flex-row items-start gap-4">
-          <div className="h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/50 flex items-center justify-center flex-shrink-0">
-            <AlertCircle className="h-6 w-6 text-red-600 dark:text-red-400" />
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20">
+            <AlertCircle className="h-6 w-6 text-white" />
           </div>
           <div className="flex-1">
             <div className="flex items-center justify-between">
-              <h3 className="text-xl font-bold text-red-600 dark:text-red-400">Earthquake Alert</h3>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 rounded-full text-red-600 dark:text-red-400 hover:bg-red-500/10"
-                onClick={() => setIsVisible(false)}
+              <h3 className="text-xl font-bold text-white">Earthquake Alert</h3>
+              <button
+                onClick={onClose}
+                className="absolute right-4 top-4 text-white hover:text-gray-200"
+                aria-label="Close alert"
               >
-                <X className="h-4 w-4" />
-                <span className="sr-only">Close</span>
-              </Button>
+                <X className="h-5 w-5" />
+              </button>
             </div>
-            <p className="mt-2 text-base font-medium text-red-800 dark:text-red-300">
+            <p className="mt-2 text-base font-medium text-white">
               A {magnitude} magnitude earthquake has been reported {location}.
               <span className="block text-sm mt-1">Detected: {time}</span>
             </p>
             <div className="mt-4 flex flex-col sm:flex-row gap-3">
-              <Link
-                href={latestEarthquake.properties.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full sm:w-auto"
+              <Button
+                variant="outline"
+                className="border-white bg-transparent text-white hover:bg-white/20"
+                onClick={() => window.open(usgsUrl, "_blank")}
               >
-                <Button size="lg" variant="destructive" className="font-medium w-full">
-                  View USGS Details
-                </Button>
-              </Link>
-              <Link href="/resources#emergency-contacts" className="w-full sm:w-auto">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-red-500 text-red-600 dark:border-red-500 dark:text-red-400 font-medium w-full"
-                >
-                  Emergency Contacts
-                </Button>
-              </Link>
+                View USGS Details
+              </Button>
+              <Button
+                variant="outline"
+                className="border-white bg-transparent text-white hover:bg-white/20"
+                onClick={onEmergencyContactsClick}
+              >
+                Emergency Contacts
+              </Button>
             </div>
           </div>
         </div>
