@@ -13,6 +13,8 @@ import { HistoricalEarthquakeChart } from "@/components/historical-earthquake-ch
 import { IntensityMap } from "@/components/intensity-map"
 import { NotificationSubscription } from "@/components/notification-subscription"
 import { SystemStatusCard } from "@/components/system-status-card"
+import { DailyImpactData } from "@/components/daily-impact-data"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export default function Home() {
   return (
@@ -25,19 +27,50 @@ export default function Home() {
           <NotificationSubscription />
           <DashboardStats />
           <DashboardFilter />
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 space-y-6">
-              <DashboardMap />
-              <AffectedAreaChart />
-              <HistoricalEarthquakeChart />
-            </div>
-            <div className="space-y-6">
-              <SystemStatusCard />
-              <QuickActions />
-              <RecentReports />
-            </div>
-          </div>
-          <IntensityMap />
+
+          {/* Dashboard Tabs */}
+          <Tabs defaultValue="map" className="w-full">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="map">Map View</TabsTrigger>
+              <TabsTrigger value="buildings">Damaged Buildings</TabsTrigger>
+              <TabsTrigger value="roads">Damaged Roads</TabsTrigger>
+              <TabsTrigger value="affected">People Affected</TabsTrigger>
+            </TabsList>
+
+            {/* Map View Tab */}
+            <TabsContent value="map" className="mt-4">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2 space-y-6">
+                  <DashboardMap />
+                  <AffectedAreaChart />
+                  <HistoricalEarthquakeChart />
+                </div>
+                <div className="space-y-6">
+                  <SystemStatusCard />
+                  <QuickActions />
+                  <RecentReports />
+                </div>
+              </div>
+              <div className="mt-6">
+                <IntensityMap />
+              </div>
+            </TabsContent>
+
+            {/* Damaged Buildings Tab */}
+            <TabsContent value="buildings" className="mt-4">
+              <DailyImpactData initialTab="buildings" />
+            </TabsContent>
+
+            {/* Damaged Roads Tab */}
+            <TabsContent value="roads" className="mt-4">
+              <DailyImpactData initialTab="roads" />
+            </TabsContent>
+
+            {/* People Affected Tab */}
+            <TabsContent value="affected" className="mt-4">
+              <DailyImpactData initialTab="affected" />
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
 

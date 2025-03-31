@@ -30,7 +30,7 @@
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
+    --ring: 222.2 84% 4.9%;
 
     --radius: 0.5rem;
   }
@@ -62,7 +62,7 @@
 
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
+    --ring: 212.7 26.8% 83.9%;
   }
 }
 
@@ -73,6 +73,68 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Myanmar font support */
+@font-face {
+  font-family: "Pyidaungsu";
+  src: url("https://cdn.jsdelivr.net/gh/khmertype/Pyidaungsu/Pyidaungsu-2.5.3_Regular.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Pyidaungsu";
+  src: url("https://cdn.jsdelivr.net/gh/khmertype/Pyidaungsu/Pyidaungsu-2.5.3_Bold.woff2") format("woff2");
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Apply Myanmar font to elements when language is set to Myanmar */
+html[lang="my"] body,
+.myanmar-lang * {
+  font-family: "Pyidaungsu", sans-serif !important;
+}
+
+/* Force Myanmar font on specific elements */
+[lang="my"] h1,
+[lang="my"] h2,
+[lang="my"] h3,
+[lang="my"] p,
+[lang="my"] span,
+[lang="my"] button,
+[lang="my"] a,
+[lang="my"] label,
+[lang="my"] input,
+[lang="my"] textarea,
+[lang="my"] select,
+[lang="my"] option {
+  font-family: "Pyidaungsu", sans-serif !important;
+}
+
+/* Custom tab styling */
+.myanmar-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.myanmar-tab:hover {
+  background-color: #f9fafb;
+}
+
+.myanmar-tab.active {
+  border: 2px solid #000;
+  font-weight: 500;
 }
 
 /* Center container styles */

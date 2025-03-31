@@ -19,12 +19,15 @@ import { ModeToggle } from "@/components/mode-toggle"
 import { Input } from "@/components/ui/input"
 import { UserProfile } from "@/components/user-profile"
 import { useAuth, UserRole } from "@/contexts/auth-context"
+import { LanguageSwitcher } from "./language-switcher"
+import { useLanguage } from "@/contexts/language-context"
 
 export function DashboardHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const pathname = usePathname()
   const { user } = useAuth()
+  const { t } = useLanguage()
 
   // Track scroll position to add background blur when scrolled
   useEffect(() => {
@@ -41,6 +44,11 @@ export function DashboardHeader() {
     { label: "Dashboard", href: "/", active: pathname === "/" },
     { label: "Reports", href: "/reports", active: pathname === "/reports" || pathname.startsWith("/reports/") },
     { label: "Teams", href: "/teams", active: pathname === "/teams" || pathname.startsWith("/teams/") },
+    {
+      label: "Impact Data",
+      href: "/impact-data",
+      active: pathname === "/impact-data" || pathname.startsWith("/impact-data/"),
+    },
     {
       label: "Data Collection",
       href: "/data-collection",
@@ -74,7 +82,7 @@ export function DashboardHeader() {
       className={`sticky top-0 z-50 w-full transition-all duration-200 ${
         isScrolled
           ? "bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60 border-b"
-          : "bg-transparent"
+          : "bg-white border-b"
       }`}
     >
       <div className="container mx-auto flex h-16 items-center justify-between py-4">
@@ -151,7 +159,7 @@ export function DashboardHeader() {
             <Link key={item.label} href={item.href}>
               <Button
                 variant={item.active ? "default" : "ghost"}
-                className={`rounded-lg ${item.active ? "" : "hover:bg-primary/10 hover:text-primary"}`}
+                className={`rounded-lg ${item.active ? "bg-blue-600 hover:bg-blue-700" : "hover:bg-primary/10 hover:text-primary"}`}
               >
                 {item.label}
               </Button>
@@ -171,6 +179,8 @@ export function DashboardHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <LanguageSwitcher />
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="icon" className="relative rounded-full border-primary/10 bg-primary/5">
