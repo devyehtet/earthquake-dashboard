@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -8,11 +10,9 @@ import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { CalendarIcon, Filter, MapPin, RefreshCw, X } from "lucide-react"
-import { format } from "date-fns"
-import { cn } from "@/lib/utils"
+import { CustomCalendar } from "@/components/custom-calendar"
 
 // Myanmar regions for the filter
 const myanmarRegions = [
@@ -35,17 +35,75 @@ const myanmarRegions = [
 
 export function DashboardFilter() {
   const [isExpanded, setIsExpanded] = useState(false)
-  const [dateFrom, setDateFrom] = useState<Date | undefined>(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)) // 30 days ago
-  const [dateTo, setDateTo] = useState<Date | undefined>(new Date())
+  const [dateFrom, setDateFrom] = useState<Date>(new Date(2025, 2, 1)) // March 1st, 2025
+  const [dateTo, setDateTo] = useState<Date>(new Date(2025, 2, 31)) // March 31st, 2025
   const [magnitudeRange, setMagnitudeRange] = useState([4.0, 8.0])
   const [region, setRegion] = useState("all")
   const [showOnlyVerified, setShowOnlyVerified] = useState(true)
   const [radius, setRadius] = useState(500)
 
+  // Calendar state
+  const [fromCalendarMonth, setFromCalendarMonth] = useState(2) // March (0-indexed)
+  const [fromCalendarYear, setFromCalendarYear] = useState(2025)
+  const [toCalendarMonth, setToCalendarMonth] = useState(2) // March (0-indexed)
+  const [toCalendarYear, setToCalendarYear] = useState(2025)
+
+  // Open state for the date pickers
+  const [fromDateOpen, setFromDateOpen] = useState(false)
+  const [toDateOpen, setToDateOpen] = useState(false)
+
+  // Format date with ordinal suffix (1st, 2nd, 3rd, etc.)
+  const formatDateWithOrdinal = (date: Date) => {
+    const day = date.getDate()
+    const month = date.toLocaleString("default", { month: "long" })
+    const year = date.getFullYear()
+
+    let suffix = "th"
+    if (day % 10 === 1 && day !== 11) suffix = "st"
+    else if (day % 10 === 2 && day !== 12) suffix = "nd"
+    else if (day % 10 === 3 && day !== 13) suffix = "rd"
+
+    return `${month} ${day}${suffix}, ${year}`
+  }
+
+  // Handle previous month
+  const handlePrevMonth = (
+    setter: React.Dispatch<React.SetStateAction<number>>,
+    yearSetter: React.Dispatch<React.SetStateAction<number>>,
+    month: number,
+    year: number,
+  ) => {
+    if (month === 0) {
+      setter(11)
+      yearSetter(year - 1)
+    } else {
+      setter(month - 1)
+    }
+  }
+
+  // Handle next month
+  const handleNextMonth = (
+    setter: React.Dispatch<React.SetStateAction<number>>,
+    yearSetter: React.Dispatch<React.SetStateAction<number>>,
+    month: number,
+    year: number,
+  ) => {
+    if (month === 11) {
+      setter(0)
+      yearSetter(year + 1)
+    } else {
+      setter(month + 1)
+    }
+  }
+
   // Handle filter reset
   const handleReset = () => {
-    setDateFrom(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
-    setDateTo(new Date())
+    setDateFrom(new Date(2025, 2, 1)) // March 1st, 2025
+    setDateTo(new Date(2025, 2, 31)) // March 31st, 2025
+    setFromCalendarMonth(2)
+    setFromCalendarYear(2025)
+    setToCalendarMonth(2)
+    setToCalendarYear(2025)
     setMagnitudeRange([4.0, 8.0])
     setRegion("all")
     setShowOnlyVerified(true)
@@ -115,34 +173,64 @@ export function DashboardFilter() {
             <div className="flex flex-col space-y-1.5">
               <Label htmlFor="date-from">Date Range</Label>
               <div className="flex gap-2">
-                <Popover>
+                <Popover open={fromDateOpen} onOpenChange={setFromDateOpen}>
                   <PopoverTrigger asChild>
                     <Button
                       id="date-from"
                       variant="outline"
-                      className={cn("w-full justify-start text-left font-normal", !dateFrom && "text-muted-foreground")}
+                      className="w-full justify-start text-left font-normal"
+                      onClick={() => setFromDateOpen(true)}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {dateFrom ? format(dateFrom, "PPP") : "Pick a date"}
+                      {formatDateWithOrdinal(dateFrom)}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar mode="single" selected={dateFrom} onSelect={setDateFrom} initialFocus />
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <CustomCalendar
+                      month={fromCalendarMonth}
+                      year={fromCalendarYear}
+                      selectedDate={dateFrom}
+                      onDateSelect={(date) => {
+                        setDateFrom(date)
+                        setFromDateOpen(false)
+                      }}
+                      onPrevMonth={() =>
+                        handlePrevMonth(setFromCalendarMonth, setFromCalendarYear, fromCalendarMonth, fromCalendarYear)
+                      }
+                      onNextMonth={() =>
+                        handleNextMonth(setFromCalendarMonth, setFromCalendarYear, fromCalendarMonth, fromCalendarYear)
+                      }
+                    />
                   </PopoverContent>
                 </Popover>
 
-                <Popover>
+                <Popover open={toDateOpen} onOpenChange={setToDateOpen}>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
-                      className={cn("w-full justify-start text-left font-normal", !dateTo && "text-muted-foreground")}
+                      className="w-full justify-start text-left font-normal"
+                      onClick={() => setToDateOpen(true)}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {dateTo ? format(dateTo, "PPP") : "Pick a date"}
+                      {formatDateWithOrdinal(dateTo)}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar mode="single" selected={dateTo} onSelect={setDateTo} initialFocus />
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <CustomCalendar
+                      month={toCalendarMonth}
+                      year={toCalendarYear}
+                      selectedDate={dateTo}
+                      onDateSelect={(date) => {
+                        setDateTo(date)
+                        setToDateOpen(false)
+                      }}
+                      onPrevMonth={() =>
+                        handlePrevMonth(setToCalendarMonth, setToCalendarYear, toCalendarMonth, toCalendarYear)
+                      }
+                      onNextMonth={() =>
+                        handleNextMonth(setToCalendarMonth, setToCalendarYear, toCalendarMonth, toCalendarYear)
+                      }
+                    />
                   </PopoverContent>
                 </Popover>
               </div>
