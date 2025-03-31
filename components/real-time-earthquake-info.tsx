@@ -108,7 +108,10 @@ export function RealTimeEarthquakeInfo() {
 
             <div className="flex flex-col sm:flex-row gap-3">
               <Link href={usgsUrl} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
-                <Button size="lg" className="font-medium gap-2 w-full">
+                <Button
+                  size="lg"
+                  className="font-medium gap-2 w-full bg-red-600 hover:bg-red-700 text-white border-red-600"
+                >
                   View on USGS
                   <ExternalLink className="h-4 w-4" />
                 </Button>
